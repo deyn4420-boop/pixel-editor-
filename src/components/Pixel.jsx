@@ -1,4 +1,6 @@
-export default function Pixel({ color, onMouseDown, onMouseEnter }) {
+import { memo } from "react";
+
+const Pixel = ({ color, onMouseDown, onMouseEnter }) => {
   return (
     <div
       onMouseDown={onMouseDown}
@@ -11,4 +13,6 @@ export default function Pixel({ color, onMouseDown, onMouseEnter }) {
       }}
     />
   );
-}
+};
+
+export default memo(Pixel);

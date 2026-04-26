@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pixel from "./Pixel";
 
 const GRID_SIZE = 16;
 
-export default function Grid({ selectedColor, tool, clearFlag }){
+export default function Grid({ selectedColor, tool,clearFlag,gridRef }){
 
   const createGrid = () => {
     return Array.from({ length: GRID_SIZE }, () =>
@@ -16,22 +15,28 @@ export default function Grid({ selectedColor, tool, clearFlag }){
   const [isDrawing, setIsDrawing] = useState(false);
   
   const paintPixel = (row, col) => {
-  const newGrid = grid.map(r => [...r]);
+  setGrid(prev => {
+    const newGrid = prev.map(r => [...r]);
 
-  if (tool === "eraser") {
-    newGrid[row][col] = "white";
-  } else {
-    newGrid[row][col] = selectedColor;
-  }
+    newGrid[row][col] =
+      tool === "eraser" ? "white" : selectedColor;
 
-  setGrid(newGrid);
+    return newGrid;
+  });
 };
 
-
- useEffect(() => {
+   useEffect(() => {
     const emptyGrid = createGrid();
     setGrid(emptyGrid);
   }, [clearFlag]);
+
+  useEffect(() => {
+  const stopDrawing = () => setIsDrawing(false);
+
+  window.addEventListener("mouseup", stopDrawing);
+
+  return () => window.removeEventListener("mouseup", stopDrawing);
+}, []);
 
   const handleMouseDown = (row, col) => {
     setIsDrawing(true);
@@ -48,7 +53,7 @@ export default function Grid({ selectedColor, tool, clearFlag }){
   };
 
   return (
-    <div onMouseUp={handleMouseUp}>
+    <div ref={gridRef} onMouseUp={handleMouseUp}>
       {grid.map((row, rowIndex) => (
         <div key={rowIndex} style={{ display: "flex" }}>
           {row.map((color, colIndex) => (
