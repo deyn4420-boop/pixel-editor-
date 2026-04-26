@@ -1,9 +1,10 @@
+import { useEffect } from "react";
 import { useState } from "react";
 import Pixel from "./Pixel";
 
 const GRID_SIZE = 16;
 
-export default function Grid({ selectedColor, tool }) {
+export default function Grid({ selectedColor, tool, clearFlag }){
 
   const createGrid = () => {
     return Array.from({ length: GRID_SIZE }, () =>
@@ -14,9 +15,6 @@ export default function Grid({ selectedColor, tool }) {
   const [grid, setGrid] = useState(createGrid);
   const [isDrawing, setIsDrawing] = useState(false);
   
-
-
-
   const paintPixel = (row, col) => {
   const newGrid = grid.map(r => [...r]);
 
@@ -30,17 +28,20 @@ export default function Grid({ selectedColor, tool }) {
 };
 
 
-
+ useEffect(() => {
+    const emptyGrid = createGrid();
+    setGrid(emptyGrid);
+  }, [clearFlag]);
 
   const handleMouseDown = (row, col) => {
     setIsDrawing(true);
     paintPixel(row, col);
   };
 
-  const handleMouseEnter = (row, col) => {
+   const handleMouseEnter = (row, col) => {
     if (!isDrawing) return;
     paintPixel(row, col);
-  };
+   };
 
   const handleMouseUp = () => {
     setIsDrawing(false);
