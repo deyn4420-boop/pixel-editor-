@@ -3,7 +3,7 @@ import Pixel from "./Pixel";
 
 const GRID_SIZE = 16;
 
-export default function Grid({ selectedColor, tool,clearFlag,gridRef }){
+export default function Grid({ selectedColor, tool, clearFlag, gridRef, setUndoFn, setRedoFn}){
 
   const createGrid = () => {
     return Array.from({ length: GRID_SIZE }, () =>
@@ -11,24 +11,57 @@ export default function Grid({ selectedColor, tool,clearFlag,gridRef }){
     );
   };
 
-  const [grid, setGrid] = useState(createGrid);
+  const [history, setHistory] = useState([createGrid()]);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const grid = history[currentStep];
   const [isDrawing, setIsDrawing] = useState(false);
   
-  const paintPixel = (row, col) => {
-  setGrid(prev => {
-    const newGrid = prev.map(r => [...r]);
+const paintPixel = (row, col) => {
+  setHistory(prevHistory => {
+    const step = currentStep; // capture once
 
-    newGrid[row][col] =
+    const current = prevHistory[step];
+    const newGrid = current.map(r => [...r]);
+
+    const newColor =
       tool === "eraser" ? "white" : selectedColor;
 
-    return newGrid;
+    if (current[row][col] === newColor) return prevHistory;
+
+    newGrid[row][col] = newColor;
+
+    const newHistory = prevHistory.slice(0, step + 1);
+    newHistory.push(newGrid);
+
+    setCurrentStep(step + 1);
+
+    return newHistory;
   });
 };
 
+const handleUndo = () => {
+  if (currentStep > 0) {
+    setCurrentStep(currentStep - 1);
+  }
+};
+
+const handleRedo = () => {
+  if (currentStep < history.length - 1) {
+    setCurrentStep(currentStep + 1);
+  }
+};
+
+useEffect(() => {
+  setUndoFn(() => handleUndo);
+  setRedoFn(() => handleRedo);
+}, [currentStep, history]);
+
    useEffect(() => {
-    const emptyGrid = createGrid();
-    setGrid(emptyGrid);
-  }, [clearFlag]);
+  const empty = createGrid();
+  setHistory([empty]);
+  setCurrentStep(0);
+}, [clearFlag]);
 
   useEffect(() => {
   const stopDrawing = () => setIsDrawing(false);
@@ -51,6 +84,8 @@ export default function Grid({ selectedColor, tool,clearFlag,gridRef }){
   const handleMouseUp = () => {
     setIsDrawing(false);
   };
+
+
 
   return (
     <div ref={gridRef} onMouseUp={handleMouseUp}>

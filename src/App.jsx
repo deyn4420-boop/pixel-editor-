@@ -7,9 +7,12 @@ const App = () => {
   const [color, setColor] = useState("#000000");
   const [tool, setTool] = useState("brush");
   const [clearFlag, setClearFlag] = useState(false);
+  const gridRef = useRef();
+  const [undoFn, setUndoFn] = useState(null);
+  const [redoFn, setRedoFn] = useState(null);
   const clearGrid = () => {
     setClearFlag(prev => !prev);
-  const gridRef = useRef();
+  
   };
 
   const handleSave = async () => {
@@ -32,6 +35,8 @@ const App = () => {
         setTool={setTool}
         clearGrid={clearGrid}
         handleSave={handleSave}
+         handleUndo={undoFn}
+  handleRedo={redoFn}
       />
 
       <Grid
@@ -39,6 +44,9 @@ const App = () => {
         tool={tool}
         clearFlag={clearFlag}
         gridRef={gridRef}
+         setUndoFn={setUndoFn}
+         setRedoFn={setRedoFn}
+        
       />
     </div>
   );

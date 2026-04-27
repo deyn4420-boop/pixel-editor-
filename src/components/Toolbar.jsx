@@ -1,4 +1,5 @@
-export default function Toolbar({ color, setColor, tool, setTool, clearGrid, handleSave }) {
+export default function Toolbar({ color, setColor, tool, setTool, clearGrid, handleSave,  handleUndo,
+  handleRedo}) {
   return (
     <div style={{
       display: "flex",
@@ -26,6 +27,14 @@ export default function Toolbar({ color, setColor, tool, setTool, clearGrid, han
       </button>
      
      <button onClick={handleSave}>Save</button>
+
+    <button onClick={handleUndo} disabled={!handleUndo}>
+     Undo
+    </button>
+
+    <button onClick={handleRedo} disabled={!handleRedo}>
+     Redo
+    </button>
       
     </div>
   );
