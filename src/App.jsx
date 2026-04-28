@@ -10,6 +10,7 @@ const App = () => {
   const gridRef = useRef();
   const [undoFn, setUndoFn] = useState(null);
   const [redoFn, setRedoFn] = useState(null);
+  const [gridSize, setGridSize] = useState(16);
   const clearGrid = () => {
     setClearFlag(prev => !prev);
   
@@ -36,18 +37,20 @@ const App = () => {
         clearGrid={clearGrid}
         handleSave={handleSave}
          handleUndo={undoFn}
-  handleRedo={redoFn}
+         handleRedo={redoFn}
+         gridSize={gridSize}
+         setGridSize={setGridSize}
       />
 
       <Grid
-        selectedColor={color}
-        tool={tool}
-        clearFlag={clearFlag}
-        gridRef={gridRef}
-         setUndoFn={setUndoFn}
-         setRedoFn={setRedoFn}
-        
-      />
+  selectedColor={color}
+  tool={tool}
+  clearFlag={clearFlag}
+  gridRef={gridRef}
+  setUndoFn={setUndoFn}
+  setRedoFn={setRedoFn}
+  gridSize={gridSize}
+/>
     </div>
   );
 };

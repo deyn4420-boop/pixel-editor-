@@ -3,13 +3,13 @@ import Pixel from "./Pixel";
 
 const GRID_SIZE = 16;
 
-export default function Grid({ selectedColor, tool, clearFlag, gridRef, setUndoFn, setRedoFn}){
+export default function Grid({ selectedColor, tool, clearFlag, gridRef, setUndoFn, setRedoFn, gridSize}){
 
   const createGrid = () => {
-    return Array.from({ length: GRID_SIZE }, () =>
-      Array.from({ length: GRID_SIZE }, () => "white")
-    );
-  };
+  return Array.from({ length: gridSize }, () =>
+    Array.from({ length: gridSize }, () => "white")
+  );
+};
 
   const [history, setHistory] = useState([createGrid()]);
   const [currentStep, setCurrentStep] = useState(0);
@@ -53,7 +53,7 @@ const floodFill = (row, col) => {
     const fill = (r, c) => {
       if (
         r < 0 || c < 0 ||
-        r >= GRID_SIZE || c >= GRID_SIZE
+        r >= gridSize || c >= gridSize
       ) return;
 
       if (gridCopy[r][c] !== targetColor) return;
@@ -98,7 +98,7 @@ useEffect(() => {
   const empty = createGrid();
   setHistory([empty]);
   setCurrentStep(0);
-}, [clearFlag]);
+}, [gridSize]);
 
   useEffect(() => {
   const stopDrawing = () => setIsDrawing(false);
