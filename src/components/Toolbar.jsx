@@ -35,6 +35,10 @@ export default function Toolbar({ color, setColor, tool, setTool, clearGrid, han
     <button onClick={handleRedo} disabled={!handleRedo}>
      Redo
     </button>
+
+    <button onClick={() => setTool("fill")}>
+     Fill
+    </button>
       
     </div>
   );

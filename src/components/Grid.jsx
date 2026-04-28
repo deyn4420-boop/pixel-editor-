@@ -18,10 +18,14 @@ export default function Grid({ selectedColor, tool, clearFlag, gridRef, setUndoF
   const [isDrawing, setIsDrawing] = useState(false);
   
 const paintPixel = (row, col) => {
-  setHistory(prevHistory => {
-    const step = currentStep; // capture once
+  if (tool === "fill") {
+    floodFill(row, col);
+    return;
+  }
 
-    const current = prevHistory[step];
+  // normal brush/eraser
+  setHistory(prevHistory => {
+    const current = prevHistory[currentStep];
     const newGrid = current.map(r => [...r]);
 
     const newColor =
@@ -31,14 +35,54 @@ const paintPixel = (row, col) => {
 
     newGrid[row][col] = newColor;
 
-    const newHistory = prevHistory.slice(0, step + 1);
+    const newHistory = prevHistory.slice(0, currentStep + 1);
     newHistory.push(newGrid);
 
+    setCurrentStep(prev => prev + 1);
+
+    return newHistory;
+  });
+};
+
+
+const floodFill = (row, col) => {
+  setHistory(prevHistory => {
+    const step = currentStep;
+    const gridCopy = prevHistory[step].map(r => [...r]);
+
+    const targetColor = gridCopy[row][col];
+    const newColor = selectedColor;
+
+    if (targetColor === newColor) return prevHistory;
+
+    
+
+    const newHistory = prevHistory.slice(0, step + 1);
+    newHistory.push(gridCopy);
+const fill = (r, c) => {
+      // boundary check
+      if (
+        r < 0 || c < 0 ||
+        r >= GRID_SIZE || c >= GRID_SIZE
+      ) return;
+
+      if (gridCopy[r][c] !== targetColor) return;
+
+      gridCopy[r][c] = newColor;
+
+      fill(r + 1, c);
+      fill(r - 1, c);
+      fill(r, c + 1);
+      fill(r, c - 1);
+    };
+
+    fill(row, col);
     setCurrentStep(step + 1);
 
     return newHistory;
   });
 };
+
 
 const handleUndo = () => {
   if (currentStep > 0) {
