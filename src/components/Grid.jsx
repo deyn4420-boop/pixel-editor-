@@ -18,14 +18,10 @@ export default function Grid({ selectedColor, tool, clearFlag, gridRef, setUndoF
   const [isDrawing, setIsDrawing] = useState(false);
   
 const paintPixel = (row, col) => {
-  if (tool === "fill") {
-    floodFill(row, col);
-    return;
-  }
-
-  // normal brush/eraser
   setHistory(prevHistory => {
-    const current = prevHistory[currentStep];
+    const step = currentStep; // capture
+
+    const current = prevHistory[step];
     const newGrid = current.map(r => [...r]);
 
     const newColor =
@@ -35,19 +31,18 @@ const paintPixel = (row, col) => {
 
     newGrid[row][col] = newColor;
 
-    const newHistory = prevHistory.slice(0, currentStep + 1);
+    const newHistory = prevHistory.slice(0, step + 1);
     newHistory.push(newGrid);
 
-    setCurrentStep(prev => prev + 1);
+    setCurrentStep(step + 1);
 
     return newHistory;
   });
 };
-
-
 const floodFill = (row, col) => {
   setHistory(prevHistory => {
     const step = currentStep;
+
     const gridCopy = prevHistory[step].map(r => [...r]);
 
     const targetColor = gridCopy[row][col];
@@ -55,12 +50,7 @@ const floodFill = (row, col) => {
 
     if (targetColor === newColor) return prevHistory;
 
-    
-
-    const newHistory = prevHistory.slice(0, step + 1);
-    newHistory.push(gridCopy);
-const fill = (r, c) => {
-      // boundary check
+    const fill = (r, c) => {
       if (
         r < 0 || c < 0 ||
         r >= GRID_SIZE || c >= GRID_SIZE
@@ -77,12 +67,15 @@ const fill = (r, c) => {
     };
 
     fill(row, col);
+
+    const newHistory = prevHistory.slice(0, step + 1);
+    newHistory.push(gridCopy);
+
     setCurrentStep(step + 1);
 
     return newHistory;
   });
 };
-
 
 const handleUndo = () => {
   if (currentStep > 0) {
@@ -116,9 +109,14 @@ useEffect(() => {
 }, []);
 
   const handleMouseDown = (row, col) => {
-    setIsDrawing(true);
-    paintPixel(row, col);
-  };
+  if (tool === "fill") {
+    floodFill(row, col);
+    return;
+  }
+
+  setIsDrawing(true);
+  paintPixel(row, col);
+};
 
    const handleMouseEnter = (row, col) => {
     if (!isDrawing) return;
